@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SPI / CPI Calculator (Multi-Semester)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #020617;
+      color: #e5e7eb;
+      min-height: 100vh;
+    }
+    header {
+      padding: 16px 20px;
+      background: #0f172a;
+      border-bottom: 1px solid #1e293b;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      color: #facc15;
+    }
+    header p {
+      margin: 4px 0 0;
+      color: #9ca3af;
+      font-size: 0.9rem;
+    }
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    .top-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+    .summary-card {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      min-width: 150px;
+    }
+    .summary-card .label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .summary-card .value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+    button {
+      font: inherit;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+      font-weight: 600;
+      transition: background 0.15s, transform 0.05s;
+    }
+    button:hover { background: #1d4ed8; }
+    button:active { transform: scale(0.97); }
+    .btn-danger {
+      background: #b91c1c;
+    }
+    .btn-danger:hover {
+      background: #991b1b;
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid #334155;
+      color: #e5e7eb;
+    }
+    .btn-ghost:hover {
+      background: #020617;
+    }
+    .semesters {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .semester {
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+      background: #020617;
+      box-shadow: 0 16px 35px rgba(15,23,42,0.6);
+      overflow: hidden;
+    }
+    .sem-header {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #020617;
+      border-bottom: 1px solid #1e293b;
+    }
+    .sem-title {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .sem-badge {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+    .sem-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .sem-body {
+      padding: 12px 14px 14px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 720px) {
+      .form-row {
+        grid-template-columns: 1fr 1fr;
+      }
+      .form-row .wide {
+        grid-column: 1 / -1;
+      }
+    }
+    input, select {
+      font: inherit;
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: #e5e7eb;
+    }
+    input:focus, select:focus, button:focus {
+      outline: 2px solid #2563eb;
+      outline-offset: 1px;
+    }
+    .error {
+      color: #fca5a5;
+      font-size: 0.8rem;
+      margin-top: -4px;
+      margin-bottom: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    th, td {
+      border-bottom: 1px solid #1f2937;
+      padding: 6px 4px;
+      text-align: left;
+    }
+    th {
+      background: #020617;
+      color: #e5e7eb;
+    }
+    .right { text-align: right; }
+    .center { text-align: center; }
+    .sem-footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      padding: 8px 14px 10px;
+      border-top: 1px solid #1f2937;
+      background: #020617;
+    }
+    .sem-footer-item .label {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .sem-footer-item .value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+    .grade-map {
+      margin-top: 16px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+    .grade-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      margin: 2px;
+    }
+    .grade-chip span.g { font-weight: 600; color: #e5e7eb; }
+    .grade-chip span.p { color: #f97316; font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SPI / CPI Calculator (IITK-style)</h1>
+    <p>Per-semester SPI and overall CPI using credit-weighted grade points.</p>
+  </header>
+
+  <main>
+    <div class="top-summary">
+      <div class="summary-card">
+        <div class="label">Total credits (all sems)</div>
+        <div class="value" id="globalTotalCredits">0.0</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Total weighted points</div>
+        <div class="value" id="globalTotalPoints">0.00</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Overall CPI</div>
+        <div class="value" id="globalCPI">0.00</div>
+      </div>
+      <button id="addSemesterBtn" type="button">+ Add semester</button>
+      <button id="clearAllDataBtn" class="btn-danger" type="button">Clear all data</button>
+    </div>
+
+    <div id="semestersContainer" class="semesters"></div>
+
+    <div class="grade-map">
+      <div>Grade to point mapping (E and F both 0; D is last positive grade):</div>
+      <div>
+        <span class="grade-chip"><span class="g">A*</span><span class="p">10</span></span>
+        <span class="grade-chip"><span class="g">A</span><span class="p">10</span></span>
+        <span class="grade-chip"><span class="g">B+</span><span class="p">9</span></span>
+        <span class="grade-chip"><span class="g">B</span><span class="p">8</span></span>
+        <span class="grade-chip"><span class="g">C+</span><span class="p">7</span></span>
+        <span class="grade-chip"><span class="g">C</span><span class="p">6</span></span>
+        <span class="grade-chip"><span class="g">D+</span><span class="p">5</span></span>
+        <span class="grade-chip"><span class="g">D</span><span class="p">4</span></span>
+        <span class="grade-chip"><span class="g">E</span><span class="p">0</span></span>
+        <span class="grade-chip"><span class="g">F</span><span class="p">0</span></span>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const gradePoints = {
+      "A*": 10, "A": 10, "B+": 9, "B": 8, "C+": 7, "C": 6, "D+": 5, "D": 4, "E": 0, "F": 0
+    };
+
+    const semestersContainer = document.getElementById("semestersContainer");
+    const addSemesterBtn = document.getElementById("addSemesterBtn");
+    const clearAllDataBtn = document.getElementById("clearAllDataBtn");
+    const globalTotalCreditsEl = document.getElementById("globalTotalCredits");
+    const globalTotalPointsEl = document.getElementById("globalTotalPoints");
+    const globalCPIEl = document.getElementById("globalCPI");
+
+    let semesters = [];
+    let nextSemId = 1;
+
+    function createSemester() {
+      const id = nextSemId++;
+      const semester = { id, name: "Semester " + id, courses: [], totalCredits: 0, totalPoints: 0, spi: 0 };
+      semesters.push(semester);
+      renderSemesters();
+      recalcGlobal();
+    }
+
+    function deleteSemester(id) {
+      semesters = semesters.filter(s => s.id !== id);
+      renderSemesters();
+      recalcGlobal();
+    }
+
+    function addCourseToSemester(semId, name, credits, grade) {
+      const sem = semesters.find(s => s.id === semId);
+      if (!sem) return;
+      const points = gradePoints[grade];
+      sem.courses.push({ name, credits, grade, points });
+      recomputeSemester(sem);
+      renderSemesters();
+      recalcGlobal();
+    }
+
+    function removeCourseFromSemester(semId, index) {
+      const sem = semesters.find(s => s.id === semId);
+      if (!sem) return;
+      sem.courses.splice(index, 1);
+      recomputeSemester(sem);
+      renderSemesters();
+      recalcGlobal();
+    }
+
+    function recomputeSemester(sem) {
+      let totalCredits = 0;
+      let totalPoints = 0;
+      sem.courses.forEach(c => {
+        totalCredits += c.credits;
+        totalPoints += c.credits * c.points;
+      });
+      sem.totalCredits = totalCredits;
+      sem.totalPoints = totalPoints;
+      sem.spi = totalCredits > 0 ? totalPoints / totalCredits : 0;
+    }
+
+    function recalcGlobal() {
+      let totalCredits = 0;
+      let totalPoints = 0;
+      semesters.forEach(s => {
+        totalCredits += s.totalCredits;
+        totalPoints += s.totalPoints;
+      });
+      const cpi = totalCredits > 0 ? totalPoints / totalCredits : 0;
+      globalTotalCreditsEl.textContent = totalCredits.toFixed(1);
+      globalTotalPointsEl.textContent = totalPoints.toFixed(2);
+      globalCPIEl.textContent = cpi.toFixed(2);
+    }
+
+    function renderSemesters() {
+      semestersContainer.innerHTML = "";
+      semesters.forEach(sem => {
+        const semDiv = document.createElement("div");
+        semDiv.className = "semester";
+
+        const header = document.createElement("div");
+        header.className = "sem-header";
+        const titleWrap = document.createElement("div");
+        const title = document.createElement("div");
+        title.className = "sem-title";
+        title.textContent = sem.name;
+        const badge = document.createElement("div");
+        badge.className = "sem-badge";
+        badge.textContent = `SPI: ${sem.spi.toFixed(2)} • Credits: ${sem.totalCredits.toFixed(1)}`;
+        titleWrap.appendChild(title);
+        titleWrap.appendChild(badge);
+
+        const actions = document.createElement("div");
+        actions.className = "sem-actions";
+        const renameBtn = document.createElement("button");
+        renameBtn.type = "button";
+        renameBtn.className = "btn-ghost";
+        renameBtn.textContent = "Rename";
+        renameBtn.onclick = () => {
+          const newName = prompt("Semester name:", sem.name);
+          if (newName && newName.trim()) {
+            sem.name = newName.trim();
+            renderSemesters();
+          }
+        };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "btn-danger";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.onclick = () => {
+          if (confirm("Delete this semester?")) {
+            deleteSemester(sem.id);
+          }
+        };
+
+        actions.appendChild(renameBtn);
+        actions.appendChild(deleteBtn);
+        header.appendChild(titleWrap);
+        header.appendChild(actions);
+
+        const body = document.createElement("div");
+        body.className = "sem-body";
+
+        const formRow = document.createElement("div");
+        formRow.className = "form-row";
+
+        const nameInput = document.createElement("input");
+        nameInput.type = "text";
+        nameInput.placeholder = "Course name (e.g., ESC101)";
+        nameInput.className = "wide";
+
+        const creditInput = document.createElement("input");
+        creditInput.type = "number";
+        creditInput.min = "0";
+        creditInput.step = "0.5";
+        creditInput
